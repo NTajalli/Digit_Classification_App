@@ -11,9 +11,9 @@ from PIL import ImageOps
 
 app = Flask(__name__)
 
+# Configure CORS for production
+CORS(app, origins=['*'])
 
-#CORS(app, resources={r"/predict/*": {"origins": "http://digit-classification-frontend.s3-website.us-east-2.amazonaws.com", "methods": "POST", "allow_headers": "Content-Type"}})
-CORS(app)
 # Load the trained model
 model = tf.keras.models.load_model('mnist_model.h5')
 
@@ -38,6 +38,20 @@ def predict():
 
 
 @app.route('/test', methods=['GET'])
-def test():    return "success"
+def test():
+    return jsonify({"status": "success", "message": "Digit classifier backend is running"})
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        "service": "Digit Classification Backend",
+        "endpoints": {
+            "predict": "/predict",
+            "test": "/test"
+        }
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Get port from environment variable (Render sets this)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)

@@ -5,7 +5,9 @@ h = canvas.height;
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, w, h);
 let isDrawing = false;
-var backendUrl = 'http://34.211.87.204/predict';
+
+// Configure backend URL based on environment
+const BACKEND_URL = 'https://digit-classifier-backend.onrender.com/predict';
 
 // Handle mouse events
 canvas.addEventListener('mousedown', () => { isDrawing = true; });
@@ -57,14 +59,29 @@ function draw(event) {
 function submitDrawing() {
   var drawnImage = canvas.toDataURL();
   
-  fetch(backendUrl, {
+  // Show loading state
+  document.getElementById('predictionMessage').innerText = 'Predicting...';
+  document.getElementById('predictionMessage').style.display = 'block';
+  
+  fetch(BACKEND_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 
-    'Access-Control-Allow-Origin': '*' },
+    headers: { 
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ image: drawnImage }),
   })
-    .then((response) => response.json())
-    .then((data) => displayPrediction(data)); 
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => displayPrediction(data))
+    .catch((error) => {
+      console.error('Error:', error);
+      document.getElementById('predictionMessage').innerText = 'Error: Could not connect to prediction service. Please try again.';
+      document.getElementById('predictionMessage').style.display = 'block';
+    });
 }
 
 function clearCanvas() {
