@@ -91,9 +91,20 @@ If you need to change the backend URL, update it in:
 
 ### Python Version Issues
 If you get TensorFlow compatibility errors:
-- The `backend/runtime.txt` specifies Python 3.11.9
-- The `backend/requirements.txt` uses conservative versions compatible with Python 3.8+
-- If issues persist, try updating to use TensorFlow 2.8.0-2.12.0 range
+
+**Option 1: Use the deployment script**
+```bash
+./deploy-render.sh
+```
+This script will try different Python/TensorFlow configurations automatically.
+
+**Option 2: Manual configuration**
+- The `backend/runtime.txt` specifies Python 3.10.12
+- The `backend/requirements.txt` uses TensorFlow 2.10-2.13 (most stable)
+- If Render forces Python 3.13, use `backend/requirements-py313.txt`
+
+**Option 3: Fallback mode**
+The backend now includes a fallback prediction method that works without TensorFlow. Even if TensorFlow fails to load, the app will still function using heuristic-based digit recognition.
 
 ### Frontend Issues
 - Check browser console for CORS errors
