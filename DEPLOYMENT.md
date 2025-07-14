@@ -89,6 +89,12 @@ If you need to change the backend URL, update it in:
 - Ensure `mnist_model.h5` is in the `backend/` directory
 - Verify all dependencies are in `backend/requirements.txt`
 
+### Python Version Issues
+If you get TensorFlow compatibility errors:
+- The `backend/runtime.txt` specifies Python 3.11.9
+- The `backend/requirements.txt` uses conservative versions compatible with Python 3.8+
+- If issues persist, try updating to use TensorFlow 2.8.0-2.12.0 range
+
 ### Frontend Issues
 - Check browser console for CORS errors
 - Verify the backend URL is correct
@@ -96,6 +102,11 @@ If you need to change the backend URL, update it in:
 
 ### CORS Issues
 The backend is configured with `CORS(app, origins=['*'])` to allow all origins.
+
+### Common Build Errors
+- **TensorFlow version errors**: Use the provided `requirements.txt` with compatible versions
+- **Python version errors**: Ensure `runtime.txt` specifies a supported Python version
+- **Memory issues**: The free tier has 512MB RAM - the model should fit comfortably
 
 ## Free Tier Limitations
 
