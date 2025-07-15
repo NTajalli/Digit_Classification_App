@@ -4,7 +4,7 @@
 
 ### 1. **Switched to `tensorflow-cpu`**
 - Changed from `tensorflow` to `tensorflow-cpu` (more reliable for deployment)
-- Using conservative version `2.11.0-2.12.0` (very stable with Python 3.11)
+- Using available versions `2.12.0-2.14.0` (stable with Python 3.11)
 
 ### 2. **Added Detailed Logging**
 - The startup logs will now show exactly what's happening
@@ -27,7 +27,7 @@ git push
 Look for these messages in the logs:
 - `🐍 Python version: 3.11.x`
 - `🔄 Attempting to import TensorFlow...`
-- `✅ TensorFlow imported successfully! Version: 2.11.x`
+- `✅ TensorFlow imported successfully! Version: 2.12.x`
 - `✅ Model file found at: mnist_model.h5`
 - `✅ TensorFlow model loaded successfully`
 
