@@ -10,7 +10,7 @@ class DigitClassifier {
     this.currentBrushSize = 10;
     
     // Configure backend URL for production
-    this.backendUrl = 'https://digit-classification-app.onrender.com';
+    this.backendUrl = 'https://digit-classification-app.onrender.com/predict';
     
     this.init();
   }
