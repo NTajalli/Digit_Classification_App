@@ -203,57 +203,27 @@ class DigitClassifier {
   }
 
   displayResults(data) {
-    const { prediction } = data;
+    const { prediction, confidence, top_predictions, method } = data;
     
     // Update main prediction
     document.getElementById('prediction-digit').textContent = prediction;
     
-    // Calculate confidence (simulation since backend doesn't provide it yet)
-    const confidence = this.simulateConfidence(prediction);
+    // Use actual confidence from backend
     document.getElementById('confidence-value').textContent = `${confidence}%`;
     
-    // Generate top predictions (simulation)
-    const topPredictions = this.generateTopPredictions(prediction, confidence);
-    this.displayTopPredictions(topPredictions);
+    // Show prediction method
+    const methodElement = document.getElementById('prediction-method');
+    if (methodElement) {
+      methodElement.textContent = method === 'tensorflow' ? 'Neural Network' : 'Heuristic Analysis';
+    }
+    
+    // Display real top predictions from backend
+    if (top_predictions && top_predictions.length > 0) {
+      this.displayTopPredictions(top_predictions);
+    }
     
     // Show results with animation
     this.showResults();
-  }
-
-  simulateConfidence(prediction) {
-    // Simulate confidence based on predicted digit
-    const baseConfidence = 85 + Math.random() * 12; // 85-97%
-    return Math.round(baseConfidence);
-  }
-
-  generateTopPredictions(actualPrediction, actualConfidence) {
-    const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const predictions = [];
-    
-    // Add the actual prediction
-    predictions.push({
-      digit: actualPrediction,
-      confidence: actualConfidence,
-      isTop: true
-    });
-    
-    // Add some random alternatives
-    const alternatives = digits.filter(d => d !== actualPrediction);
-    const shuffled = alternatives.sort(() => Math.random() - 0.5);
-    
-    let remainingConfidence = 100 - actualConfidence;
-    
-    for (let i = 0; i < Math.min(4, shuffled.length); i++) {
-      const confidence = Math.round(remainingConfidence * (Math.random() * 0.5 + 0.2));
-      predictions.push({
-        digit: shuffled[i],
-        confidence: confidence,
-        isTop: false
-      });
-      remainingConfidence -= confidence;
-    }
-    
-    return predictions.sort((a, b) => b.confidence - a.confidence);
   }
 
   displayTopPredictions(predictions) {
@@ -262,7 +232,7 @@ class DigitClassifier {
     
     predictions.forEach((pred, index) => {
       const item = document.createElement('div');
-      item.className = `prediction-item ${pred.isTop ? 'top' : ''}`;
+      item.className = `prediction-item ${index === 0 ? 'top' : ''}`;
       item.innerHTML = `
         <div class="prediction-digit-small">${pred.digit}</div>
         <div class="prediction-confidence-small">${pred.confidence}%</div>

@@ -115,24 +115,23 @@
       </section>
 
       <!-- Results Section -->
-      <section class="results-section" id="results-section">
-        <div class="results-card">
-          <div class="results-header">
-            <h3 class="results-title">My Guess</h3>
-          </div>
-          
-          <div class="main-prediction" id="main-prediction">
-            <div class="prediction-digit" id="prediction-digit">?</div>
-            <div class="prediction-confidence" id="prediction-confidence">
-              <span class="confidence-label">Confidence</span>
-              <span class="confidence-value" id="confidence-value">--%</span>
+      <section id="results-section" class="results-section">
+        <div class="results-container">
+          <div class="prediction-result">
+            <div class="prediction-digit-large" id="prediction-digit">?</div>
+            <div class="prediction-confidence">
+              <span id="confidence-value">0%</span>
+              <span class="confidence-label">confidence</span>
+            </div>
+            <div class="prediction-method-info">
+              <span id="prediction-method">Neural Network</span>
             </div>
           </div>
           
-          <div class="prediction-details" id="prediction-details">
-            <h4 class="details-title">Other Possibilities</h4>
-            <div class="predictions-list" id="predictions-list">
-              <!-- Predictions will be populated here -->
+          <div class="predictions-breakdown">
+            <h3>Top Predictions</h3>
+            <div id="predictions-list" class="predictions-list">
+              <!-- Dynamic content -->
             </div>
           </div>
         </div>

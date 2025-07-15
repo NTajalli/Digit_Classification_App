@@ -95,7 +95,33 @@ function clearCanvas() {
 }
 
 function displayPrediction(data) {
-  var message = "Did you draw a " + data.prediction + "?";
+  const { prediction, confidence, top_predictions, method } = data;
+  
+  // Show main prediction
+  let message = `Did you draw a ${prediction}?`;
+  
+  // Add confidence if available
+  if (confidence) {
+    message += ` (${confidence}% confidence)`;
+  }
+  
+  // Add method info
+  if (method) {
+    const methodText = method === 'tensorflow' ? 'Neural Network' : 'Heuristic Analysis';
+    message += ` - ${methodText}`;
+  }
+  
   document.getElementById('predictionMessage').innerText = message;
-  document.getElementById("predictionMessage").style.display = "block";
+  document.getElementById('predictionMessage').style.display = 'block';
+  
+  // Show top predictions if available
+  if (top_predictions && top_predictions.length > 1) {
+    let topPredictionsText = '\nTop predictions: ';
+    top_predictions.slice(0, 3).forEach((pred, index) => {
+      if (index > 0) topPredictionsText += ', ';
+      topPredictionsText += `${pred.digit} (${pred.confidence}%)`;
+    });
+    
+    document.getElementById('predictionMessage').innerText += topPredictionsText;
+  }
 }
