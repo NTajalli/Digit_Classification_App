@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory, jsonify
 from flask_cors import CORS
 import numpy as np
 import os
+import sys
 from flask import url_for
 from PIL import Image, ImageOps
 import io
@@ -15,13 +16,36 @@ CORS(app, origins=['*'])
 # Check if we should use fallback only
 USE_FALLBACK_ONLY = os.environ.get('USE_FALLBACK_ONLY', '0') == '1'
 
+print(f"🐍 Python version: {sys.version}")
+print(f"🔧 USE_FALLBACK_ONLY: {USE_FALLBACK_ONLY}")
+print(f"📍 Current working directory: {os.getcwd()}")
+
 # Try to load TensorFlow model, fall back to simple prediction if it fails
 model = None
 if not USE_FALLBACK_ONLY:
     try:
+        print("🔄 Attempting to import TensorFlow...")
         import tensorflow as tf
-        model = tf.keras.models.load_model('mnist_model.h5')
-        print("✅ TensorFlow model loaded successfully")
+        print(f"✅ TensorFlow imported successfully! Version: {tf.__version__}")
+        
+        print("🔄 Attempting to load model...")
+        model_path = 'mnist_model.h5'
+        if os.path.exists(model_path):
+            print(f"✅ Model file found at: {model_path}")
+            model = tf.keras.models.load_model(model_path)
+            print("✅ TensorFlow model loaded successfully")
+        else:
+            print(f"❌ Model file not found at: {model_path}")
+            print(f"📁 Files in current directory: {os.listdir('.')}")
+            
+    except ImportError as e:
+        print(f"❌ TensorFlow import failed: {e}")
+        print("📦 Available packages:")
+        import pkg_resources
+        installed_packages = [d.project_name for d in pkg_resources.working_set]
+        tf_packages = [p for p in installed_packages if 'tensor' in p.lower()]
+        print(f"TensorFlow-related packages: {tf_packages}")
+        print("Using fallback prediction method")
     except Exception as e:
         print(f"⚠️ Could not load TensorFlow model: {e}")
         print("Using fallback prediction method")
@@ -105,7 +129,30 @@ def test():
         "status": "success", 
         "message": "Digit classifier backend is running",
         "model_status": model_status,
-        "fallback_only": USE_FALLBACK_ONLY
+        "fallback_only": USE_FALLBACK_ONLY,
+        "python_version": sys.version
+    })
+
+@app.route('/debug', methods=['GET'])
+def debug():
+    """Debug endpoint to check environment"""
+    try:
+        import tensorflow as tf
+        tf_version = tf.__version__
+        tf_available = True
+    except ImportError:
+        tf_version = "Not installed"
+        tf_available = False
+    
+    return jsonify({
+        "python_version": sys.version,
+        "tensorflow_available": tf_available,
+        "tensorflow_version": tf_version,
+        "model_loaded": model is not None,
+        "current_directory": os.getcwd(),
+        "model_file_exists": os.path.exists('mnist_model.h5'),
+        "files_in_directory": os.listdir('.'),
+        "use_fallback_only": USE_FALLBACK_ONLY
     })
 
 @app.route('/', methods=['GET'])
@@ -121,7 +168,8 @@ def home():
         "fallback_only": USE_FALLBACK_ONLY,
         "endpoints": {
             "predict": "/predict",
-            "test": "/test"
+            "test": "/test",
+            "debug": "/debug"
         }
     })
 
