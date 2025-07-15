@@ -106,9 +106,10 @@ If you need to change the backend URL, update it in:
 ### Python Version Issues
 If you get TensorFlow compatibility errors:
 
-**Option 1: Try the updated requirements (Python 3.13 compatible)**
-- The `backend/requirements.txt` now uses Python 3.13 compatible versions
-- TensorFlow 2.15+ with NumPy 1.24+ should work with Python 3.13
+**Option 1: Try the updated requirements (Python 3.11 compatible)**
+- The `.python-version` file specifies Python 3.11 for Render
+- The `backend/requirements.txt` now uses Python 3.11 compatible versions
+- TensorFlow 2.11-2.14 with NumPy 1.21-1.25 should work reliably with Python 3.11
 
 **Option 2: Use minimal fallback deployment**
 - Use `backend/requirements-minimal.txt` (no TensorFlow)
