@@ -12,15 +12,21 @@ app = Flask(__name__)
 # Configure CORS for production
 CORS(app, origins=['*'])
 
+# Check if we should use fallback only
+USE_FALLBACK_ONLY = os.environ.get('USE_FALLBACK_ONLY', '0') == '1'
+
 # Try to load TensorFlow model, fall back to simple prediction if it fails
 model = None
-try:
-    import tensorflow as tf
-    model = tf.keras.models.load_model('mnist_model.h5')
-    print("✅ TensorFlow model loaded successfully")
-except Exception as e:
-    print(f"⚠️ Could not load TensorFlow model: {e}")
-    print("Using fallback prediction method")
+if not USE_FALLBACK_ONLY:
+    try:
+        import tensorflow as tf
+        model = tf.keras.models.load_model('mnist_model.h5')
+        print("✅ TensorFlow model loaded successfully")
+    except Exception as e:
+        print(f"⚠️ Could not load TensorFlow model: {e}")
+        print("Using fallback prediction method")
+else:
+    print("🔄 Using fallback prediction method only (USE_FALLBACK_ONLY=1)")
 
 def predict_digit_simple(image_array):
     """
@@ -78,11 +84,16 @@ def predict():
         if model is not None:
             # Use TensorFlow model
             prediction = model.predict(image_array.reshape(1, 28, 28, 1)).argmax()
+            prediction_method = "tensorflow"
         else:
             # Use fallback method
             prediction = predict_digit_simple(image_array)
+            prediction_method = "fallback"
 
-        return jsonify({"prediction": str(prediction)})
+        return jsonify({
+            "prediction": str(prediction),
+            "method": prediction_method
+        })
     except Exception as e:
         print(f"Error in prediction: {e}")
         return jsonify({"error": str(e)}), 500
@@ -93,15 +104,21 @@ def test():
     return jsonify({
         "status": "success", 
         "message": "Digit classifier backend is running",
-        "model_status": model_status
+        "model_status": model_status,
+        "fallback_only": USE_FALLBACK_ONLY
     })
 
 @app.route('/', methods=['GET'])
 def home():
-    model_status = "TensorFlow model loaded" if model is not None else "Using fallback prediction"
+    if USE_FALLBACK_ONLY:
+        model_status = "Using fallback prediction only"
+    else:
+        model_status = "TensorFlow model loaded" if model is not None else "Using fallback prediction"
+    
     return jsonify({
         "service": "Digit Classification Backend",
         "model_status": model_status,
+        "fallback_only": USE_FALLBACK_ONLY,
         "endpoints": {
             "predict": "/predict",
             "test": "/test"

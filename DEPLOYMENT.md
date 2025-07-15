@@ -22,14 +22,28 @@ This guide explains how to deploy the Digit Classification App with the backend 
 3. Authorize Render to access your repositories
 
 ### 1.2 Deploy Backend Service
+
+**Option A: Full TensorFlow Model (Recommended)**
 1. Click "New" → "Web Service"
 2. Connect your GitHub repository
 3. Configure the service:
    - **Name**: `digit-classifier-backend`
    - **Runtime**: `Python 3`
-   - **Build Command**: `pip install -r backend/requirements.txt`
+   - **Build Command**: `pip install --upgrade pip setuptools wheel && pip install -r backend/requirements.txt`
    - **Start Command**: `cd backend && python app.py`
    - **Plan**: Free
+4. Click "Deploy"
+
+**Option B: Fallback-Only Mode (If TensorFlow fails)**
+1. Click "New" → "Web Service"
+2. Connect your GitHub repository
+3. Configure the service:
+   - **Name**: `digit-classifier-backend`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install --upgrade pip setuptools wheel && pip install -r backend/requirements-minimal.txt`
+   - **Start Command**: `cd backend && python app.py`
+   - **Plan**: Free
+   - **Environment Variables**: Add `USE_FALLBACK_ONLY=1`
 4. Click "Deploy"
 
 ### 1.3 Configure Environment (Optional)
@@ -92,19 +106,20 @@ If you need to change the backend URL, update it in:
 ### Python Version Issues
 If you get TensorFlow compatibility errors:
 
-**Option 1: Use the deployment script**
+**Option 1: Try the updated requirements (Python 3.13 compatible)**
+- The `backend/requirements.txt` now uses Python 3.13 compatible versions
+- TensorFlow 2.15+ with NumPy 1.24+ should work with Python 3.13
+
+**Option 2: Use minimal fallback deployment**
+- Use `backend/requirements-minimal.txt` (no TensorFlow)
+- Set environment variable `USE_FALLBACK_ONLY=1`
+- Guaranteed to work with any Python version
+
+**Option 3: Use the deployment script**
 ```bash
 ./deploy-render.sh
 ```
 This script will try different Python/TensorFlow configurations automatically.
-
-**Option 2: Manual configuration**
-- The `backend/runtime.txt` specifies Python 3.10.12
-- The `backend/requirements.txt` uses TensorFlow 2.10-2.13 (most stable)
-- If Render forces Python 3.13, use `backend/requirements-py313.txt`
-
-**Option 3: Fallback mode**
-The backend now includes a fallback prediction method that works without TensorFlow. Even if TensorFlow fails to load, the app will still function using heuristic-based digit recognition.
 
 ### Frontend Issues
 - Check browser console for CORS errors

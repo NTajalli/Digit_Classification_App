@@ -2,7 +2,7 @@ services:
   - type: web
     name: digit-classifier-backend
     runtime: python3
-    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r backend/requirements.txt"
+    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r backend/requirements-minimal.txt"
     startCommand: "cd backend && python app.py"
     plan: free
     healthCheckPath: /test
@@ -16,5 +16,5 @@ services:
           property: port
       - key: PYTHONUNBUFFERED
         value: "1"
-      - key: PIP_NO_CACHE_DIR
+      - key: USE_FALLBACK_ONLY
         value: "1" 
